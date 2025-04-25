@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy Interactive Website (Flexbox)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide-react@0.363.0"></script>
+    <style>
+        /* Custom CSS for button transitions and animations */
+        .floating-button {
+            position: absolute; /* Allows absolute positioning for floating */
+            transition: all 0.3s ease-in-out; /* Smooth transition for position and other properties */
+            cursor: pointer;
+            /* Add a subtle shadow */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            z-index: 20; /* Ensure buttons are above the flexbox content */
+        }
+
+        .floating-button:hover {
+            transform: scale(1.1); /* Slightly enlarge on hover */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1); /* Enhance shadow on hover */
+        }
+
+        /* Keyframes for the jump animation */
+        @keyframes jump {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); } /* Jump up */
+            100% { transform: translateY(0); } /* Fall back down */
+        }
+
+        .jump-animation {
+            animation: jump 0.4s ease-in-out; /* Apply the jump animation */
+        }
+
+        /* Ensure the body takes full viewport height */
+        body {
+            min-height: 100vh;
+            overflow: hidden; /* Hide overflow from floating buttons */
+            font-family: 'Inter', sans-serif; /* Use Inter font */
+            /* The background gradient is applied here */
+        }
+
+        /* Container for floating buttons - covers the whole viewport */
+        .floating-container {
+            position: absolute; /* Position absolutely to cover the background */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%; /* Take full viewport height */
+            overflow: hidden; /* Hide buttons that float outside */
+            z-index: 10; /* Buttons are above the background but below the main content flexbox */
+            pointer-events: none; /* Allow clicks to pass through to the flexbox content */
+        }
+
+        /* Individual floating buttons need pointer events enabled */
+        .floating-button {
+            pointer-events: auto;
+        }
+
+        /* Flexbox container for the main content */
+        .main-content-flexbox {
+            display: flex; /* Enable flexbox */
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center items horizontally */
+            justify-content: center; /* Center items vertically */
+            min-height: 100vh; /* Take at least full viewport height */
+            width: 90%; /* Set a width, adjust as needed */
+            max-width: 1200px; /* Max width for larger screens */
+            margin: 0 auto; /* Center the flexbox container */
+            padding: 2rem; /* Add some padding inside */
+            border: 2px solid rgba(255, 255, 255, 0.5); /* White border with transparency */
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white background */
+            border-radius: 1rem; /* Rounded corners for the flexbox */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Add a shadow */
+            position: relative; /* Needed for z-index to work relative to floating buttons */
+            z-index: 30; /* Ensure flexbox content is above floating buttons */
+            backdrop-filter: blur(5px); /* Add a subtle blur effect behind the box */
+            -webkit-backdrop-filter: blur(5px); /* For Safari */
+        }
+
+        /* Style for content cards within the flexbox */
+        .content-card {
+            background-color: rgba(255, 255, 255, 0.8); /* More opaque white background */
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0.75rem;
+            width: 100%;
+            max-width: 600px;
+            text-align: left;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px); /* Lift card on hover */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 text-gray-800">
+
+    <div id="buttons-area" class="floating-container">
+        </div>
+
+    <div class="main-content-flexbox">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">Welcome to Our Fancy Site</h1>
+            <p class="text-xl md:text-2xl text-gray-700">Explore the interactive elements below!</p>
+        </div>
+
+        <div class="content-card">
+            <h2 class="text-2xl font-semibold mb-2">Our Mission</h2>
+            <p>We strive to create amazing web experiences that delight and engage users. Our focus is on innovative design and seamless functionality.</p>
+        </div>
+
+        <div class="content-card">
+            <h2 class="text-2xl font-semibold mb-2">Our Services</h2>
+            <p>From bespoke web development to creative design and digital marketing, we offer a range of services to help your business succeed online.</p>
+        </div>
+
+        <div class="content-card">
+            <h2 class="text-2xl font-semibold mb-2">Get in Touch</h2>
+            <p>Have a project in mind? We'd love to hear from you! Contact us today to discuss your needs and see how we can help.</p>
+        </div>
+
+    </div>
+
+    <script>
+        const buttonsArea = document.getElementById('buttons-area');
+        const buttonLabels = ["About Us", "Services", "Portfolio", "Contact", "Blog"];
+        const buttonColors = ["bg-blue-500", "bg-green-500", "bg-yellow-500", "bg-purple-500", "bg-teal-500"];
+
+        // Create and position buttons
+        function createFloatingButtons() {
+            buttonsArea.innerHTML = ''; // Clear existing buttons
+            const containerWidth = buttonsArea.offsetWidth;
+            const containerHeight = buttonsArea.offsetHeight;
+
+            buttonLabels.forEach((label, index) => {
+                const button = document.createElement('button');
+                button.textContent = label;
+                button.classList.add(
+                    'floating-button',
+                    'px-6',
+                    'py-3',
+                    'rounded-full',
+                    'text-white',
+                    'font-semibold',
+                    buttonColors[index % buttonColors.length], // Cycle through colors
+                    'hover:bg-opacity-90', // Slightly transparent on hover
+                    'focus:outline-none', // Remove default focus outline
+                    'focus:ring-2', // Add a ring on focus
+                    'focus:ring-white',
+                    'focus:ring-opacity-50'
+                );
+
+                // Random initial position
+                const randomX = Math.random() * (containerWidth - 150); // Subtract button width estimate
+                const randomY = Math.random() * (containerHeight - 80); // Subtract button height estimate
+                button.style.left = `${randomX}px`;
+                button.style.top = `${randomY}px`;
+
+                // Add click event listener for the jump effect
+                button.addEventListener('click', () => {
+                    // Remove existing animation class to restart animation
+                    button.classList.remove('jump-animation');
+                    // Force reflow to restart animation
+                    void button.offsetWidth;
+                    // Add the animation class back
+                    button.classList.add('jump-animation');
+
+                    // Optional: Do something when the button is clicked
+                    console.log(`${label} button clicked!`);
+                    showMessage(`You clicked the ${label} button!`); // Using custom message box
+                });
+
+                buttonsArea.appendChild(button);
+            });
+        }
+
+        // Function to gently move buttons over time (the "loop" effect)
+        function animateButtons() {
+            const buttons = buttonsArea.querySelectorAll('.floating-button');
+            const containerWidth = buttonsArea.offsetWidth;
+            const containerHeight = buttonsArea.offsetHeight;
+
+            buttons.forEach(button => {
+                // Get current position
+                let currentX = parseFloat(button.style.left);
+                let currentY = parseFloat(button.style.top);
+
+                // Calculate a small random movement
+                const moveAmount = 3; // Pixels to move per step (slightly reduced for subtlety)
+                const deltaX = (Math.random() - 0.5) * moveAmount * 2; // Random value between -moveAmount and +moveAmount
+                const deltaY = (Math.random() - 0.5) * moveAmount * 2;
+
+                // Calculate new position, keeping within bounds
+                let newX = currentX + deltaX;
+                let newY = currentY + deltaY;
+
+                // Keep buttons within the container with some padding
+                const buttonWidth = button.offsetWidth;
+                const buttonHeight = button.offsetHeight;
+                newX = Math.max(0, Math.min(newX, containerWidth - buttonWidth));
+                newY = Math.max(0, Math.min(newY, containerHeight - buttonHeight));
+
+
+                button.style.left = `${newX}px`;
+                button.style.top = `${newY}px`;
+            });
+
+            // Request next frame for smooth animation
+            requestAnimationFrame(animateButtons);
+        }
+
+        // Initial setup on page load
+        window.onload = () => {
+            createFloatingButtons();
+            animateButtons(); // Start the continuous floating animation
+        };
+
+        // Recalculate button positions on window resize
+        window.addEventListener('resize', () => {
+             // Recreate buttons to ensure they fit the new size
+            createFloatingButtons();
+        });
+
+         // Simple custom message box function (replaces alert)
+         function showMessage(message) {
+            const messageBox = document.createElement('div');
+            messageBox.classList.add(
+                'fixed', 'top-1/2', 'left-1/2', 'transform', '-translate-x-1/2', '-translate-y-1/2',
+                'bg-white', 'p-6', 'rounded-lg', 'shadow-xl', 'z-50', 'text-center',
+                'max-w-sm', 'w-full', 'text-gray-800' /* Ensure text is visible */
+            );
+            messageBox.innerHTML = `
+                <p class="text-lg font-semibold mb-4">${message}</p>
+                <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="this.parentElement.remove()">Close</button>
+            `;
+            document.body.appendChild(messageBox);
+        }
+
+    </script>
+
+</body>
+</html>
